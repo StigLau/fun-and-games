@@ -5,11 +5,7 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Random
 
-
-
 -- MAIN
-
-
 main =
   Browser.element
     { init = init
@@ -18,27 +14,28 @@ main =
     , view = view
     }
 
-
-
 -- MODEL
-
-
 type alias Model =
   { dieFace : Int
+  , allCards : List Card
   }
+
+type alias Card =
+    { name: String
+    , cardId : Int
+    }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model 1
+  ( Model 1 [(genCard "Heart 2" 2) ]
   , Cmd.none
   )
 
-
+genCard name value =
+    Card name value
 
 -- UPDATE
-
-
 type Msg
   = Roll
   | NewFace Int
@@ -53,7 +50,7 @@ update msg model =
       )
 
     NewFace newFace ->
-      ( Model newFace
+      ( Model newFace []
       , Cmd.none
       )
 
@@ -76,4 +73,6 @@ view model =
   div []
     [ h1 [] [ text (String.fromInt model.dieFace) ]
     , button [ onClick Roll ] [ text "Roll" ]
+    , div [] [text "WHITESPACE"]
+    , text "Mordi er en geit"
     ]
