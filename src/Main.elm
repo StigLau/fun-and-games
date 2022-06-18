@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import CardStuff exposing (initialCardList, cardsToNames, shuffleList)
+import CardStuff exposing (cardsToNames, dealOneCard, initialCardList, shuffleList)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Model exposing (Model, Card, Player)
@@ -19,7 +19,13 @@ main =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model initialCardList [(Model.Player "Gunnar" [Card "Ost 2" 2, Card "Ost 4" 4]), (Model.Player "Bjartram" [Card "Ost 3" 3])]
+  ( Model initialCardList
+  [ (Model.Player "Dealer" [])
+  , (Model.Player "Bjartram" [])
+  , (Model.Player "Gunnar" [])
+  , (Model.Player "Nisseleif" [])
+  , (Model.Player "Knugen av Danmark" [])
+  ]
   , Cmd.none
   )
 
@@ -28,6 +34,7 @@ init _ =
 type Msg
   = ShuffleCards
   | ShuffleDeck Int
+  | DealOneCard
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -44,6 +51,10 @@ update msg model =
         , Cmd.none
         )
 
+    DealOneCard ->
+        let nuModel = dealOneCard model
+        in ( nuModel, Cmd.none)
+
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -57,9 +68,9 @@ view model =
     , h3 [] [text "Deck of available cards:"]
     , h4 [] (stringToText (cardsToNames model.allCards))
     , button [ onClick ShuffleCards ] [ text "Shuffle Deck" ]
+    , button [ onClick DealOneCard ] [ text "Deal one card" ]
     , div [] [text "WHITESPACE", text "BLACKSPACE"]
     , h2 [] [ text "List Players"]
---    , text ( "Mordi er en "  ++ mordi)
     , text  (playersToVisuals model.players)
     ]
 
@@ -73,14 +84,11 @@ playersToVisuals players =
 
 playerToVisuals: Player -> String
 playerToVisuals player = player.name ++  ": " ++  (List.foldl (++) "" (cardsToNames player.hand) )
---playerToVisuals player = cardsToNames player.hand
 
-
---playerToText: Player -> String
---playerToText player = player.name ++ " " ++ cardsToNames player.hand
 
 stringToText: List String ->  List (Html Msg)
 stringToText listOfStuff =
     case listOfStuff of
         head :: tail -> text head :: stringToText tail
         [] -> []
+

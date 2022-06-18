@@ -1,6 +1,6 @@
-module CardStuff exposing (initialCardList, shuffleList, cardsToNames)
+module CardStuff exposing (initialCardList, shuffleList, cardsToNames, dealOneCard)
 
-import Model exposing (Card)
+import Model exposing (Model, Card, Player)
 import Random exposing (Seed, int, step)
 import List.Extra exposing (getAt, removeAt)
 
@@ -101,3 +101,38 @@ shuffleListHelper seed source result =
                 Nothing ->
                     Debug.log "generated an index outside list"[]
 
+dealOneCard: Model -> Model
+dealOneCard model =
+    let
+        players = model.players
+        stack = model.allCards
+        (modifiedPlayers, modifiedStack) = dealCards players stack
+        newModel = Model modifiedStack modifiedPlayers
+    in
+        newModel
+
+dealCards: List Player -> List Card -> (List Player, List Card)
+dealCards players stack =
+    case players of
+        [] -> ([], stack)
+        [lastPlayer] ->
+            let
+                (modifiedPlayer, modifiedStack) = dealCardToPlayer lastPlayer stack
+            in
+                ([modifiedPlayer], modifiedStack)
+        head :: tail ->
+                let
+                    (heedy, stackRest) = dealCardToPlayer head stack
+                    (taily, endingStack) = dealCards tail stackRest
+                in
+                    (heedy :: taily, endingStack)
+
+dealCardToPlayer: Player -> List Card -> (Player, List Card)
+dealCardToPlayer   singlePlayer stack =
+        case stack of
+                [] -> (singlePlayer, [])
+                [x] -> (addCardToPlayer singlePlayer x, [])
+                head :: tail -> (addCardToPlayer singlePlayer head, tail)
+
+addCardToPlayer: Player -> Card -> Player
+addCardToPlayer player card = Player player.name (card :: player.hand)
