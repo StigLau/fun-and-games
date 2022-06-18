@@ -1,4 +1,4 @@
-module CardStuff exposing (initialCardList, shuffleList, cardsToNames, dealOneCard)
+module CardStuff exposing (initialCardList, shuffleList, cardsToNames, dealCardWithModel)
 
 import Model exposing (Model, Card, Player)
 import Random exposing (Seed, int, step)
@@ -6,7 +6,6 @@ import List.Extra exposing (getAt, removeAt)
 
 genCard name value =
     Card name value
-
 
 initialCardList : List Card
 initialCardList =
@@ -101,37 +100,25 @@ shuffleListHelper seed source result =
                 Nothing ->
                     Debug.log "generated an index outside list"[]
 
+dealCardWithModel: Model -> Model
+dealCardWithModel model =
+     dealOneCard model
+
 dealOneCard: Model -> Model
 dealOneCard model =
-    let
-        players = model.players
-        stack = model.allCards
-        (modifiedPlayers, modifiedStack) = dealCards players stack
-        newModel = Model modifiedStack modifiedPlayers
-    in
-        newModel
-
-dealCards: List Player -> List Card -> (List Player, List Card)
-dealCards players stack =
-    case players of
-        [] -> ([], stack)
-        [lastPlayer] ->
-            let
-                (modifiedPlayer, modifiedStack) = dealCardToPlayer lastPlayer stack
-            in
-                ([modifiedPlayer], modifiedStack)
+    case model.players of
+        [] -> Model [] model.currentDeck
         head :: tail ->
                 let
-                    (heedy, stackRest) = dealCardToPlayer head stack
-                    (taily, endingStack) = dealCards tail stackRest
+                    (headPlayer, firstStack) = dealCardToPlayer head model.currentDeck
+                    modifiedModel = dealOneCard (Model tail firstStack)
                 in
-                    (heedy :: taily, endingStack)
+                    Model (headPlayer :: modifiedModel.players) modifiedModel.currentDeck
 
 dealCardToPlayer: Player -> List Card -> (Player, List Card)
 dealCardToPlayer   singlePlayer stack =
         case stack of
-                [] -> (singlePlayer, [])
-                [x] -> (addCardToPlayer singlePlayer x, [])
+                [] -> (singlePlayer, []) --No cards left to deal
                 head :: tail -> (addCardToPlayer singlePlayer head, tail)
 
 addCardToPlayer: Player -> Card -> Player

@@ -2,8 +2,8 @@ module Model exposing (..)
 
 -- MODEL
 type alias Model =
-  { allCards : List Card
-  , players: List Player
+  { players: List Player
+  , currentDeck : List Card
   }
 
 type alias Card =

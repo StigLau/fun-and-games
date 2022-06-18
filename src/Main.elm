@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import CardStuff exposing (cardsToNames, dealOneCard, initialCardList, shuffleList)
+import CardStuff exposing (cardsToNames, dealCardWithModel, initialCardList, shuffleList)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Model exposing (Model, Card, Player)
@@ -18,14 +18,13 @@ main =
 
 
 init : () -> (Model, Cmd Msg)
-init _ =
-  ( Model initialCardList
+init _ = ( Model
   [ (Model.Player "Dealer" [])
   , (Model.Player "Bjartram" [])
   , (Model.Player "Gunnar" [])
   , (Model.Player "Nisseleif" [])
   , (Model.Player "Knugen av Danmark" [])
-  ]
+  ] initialCardList
   , Cmd.none
   )
 
@@ -47,13 +46,12 @@ update msg model =
         )
 
     ShuffleDeck seed  ->
-        ( Model ( shuffleList (initialSeed seed) model.allCards) model.players
+        ( Model model.players ( shuffleList (initialSeed seed) model.currentDeck)
         , Cmd.none
         )
 
     DealOneCard ->
-        let nuModel = dealOneCard model
-        in ( nuModel, Cmd.none)
+        ( dealCardWithModel model, Cmd.none)
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
@@ -66,10 +64,9 @@ view model =
     div []
     [ h1 [] [ text ("AppTitle") ]
     , h3 [] [text "Deck of available cards:"]
-    , h4 [] (stringToText (cardsToNames model.allCards))
+    , h4 [] (stringToText (cardsToNames model.currentDeck))
     , button [ onClick ShuffleCards ] [ text "Shuffle Deck" ]
     , button [ onClick DealOneCard ] [ text "Deal one card" ]
-    , div [] [text "WHITESPACE", text "BLACKSPACE"]
     , h2 [] [ text "List Players"]
     , text  (playersToVisuals model.players)
     ]
@@ -78,7 +75,6 @@ playersToVisuals:  List Player -> String
 playersToVisuals players =
         case players of
             [] -> ""
-            [x] -> playerToVisuals x
             head :: tail -> (playerToVisuals head ) ++  " - " ++ (playersToVisuals tail)
 
 
