@@ -1,7 +1,7 @@
-module CardStuff exposing (initialCardList, shuffleList, printCardNames)
-import Html exposing (Html, text)
+module CardStuff exposing (initialCardList, shuffleList, cardsToNames)
+
 import Model exposing (Card)
-import Random exposing (Seed, initialSeed, int, step)
+import Random exposing (Seed, int, step)
 import List.Extra exposing (getAt, removeAt)
 
 genCard name value =
@@ -38,12 +38,12 @@ initialCardList =
         ,(genCard "King of Clubs" 13)
         ]
 
-printCardNames: List Card ->  List (Html msg)
-printCardNames cards =
+cardsToNames: List Card ->  List String
+cardsToNames cards =
     case cards of
             [] -> []
-            [x] -> [text x.name]
-            head :: tail -> text head.name :: text " - " :: printCardNames tail
+            [x] -> [x.name]
+            head :: tail -> head.name :: " - " :: cardsToNames tail
 
 shuffleList : Seed -> List a -> List a
 shuffleList seed list =

@@ -1,13 +1,11 @@
 module Main exposing (..)
 
 import Browser
-import CardStuff exposing (initialCardList, printCardNames, shuffleList)
+import CardStuff exposing (initialCardList, cardsToNames, shuffleList)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Model exposing (Card, Model)
 import Random exposing (Seed, initialSeed)
-
-import Debug
 
 -- MAIN
 main =
@@ -29,7 +27,7 @@ init _ =
 -- UPDATE
 type Msg
   = ShuffleCards
-  | Randoom Int
+  | Randoomize Int
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -37,10 +35,10 @@ update msg model =
   case msg of
     ShuffleCards ->
       ( model
-      , Random.generate Randoom (Random.int 1 99)
+      , Random.generate Randoomize (Random.int 1 99)
       )
 
-    Randoom seed  ->
+    Randoomize seed  ->
          ( Model ( shuffleList (initialSeed seed) model.allCards)
           , Cmd.none
           )
@@ -57,15 +55,16 @@ subscriptions model =
 -- VIEW
 view : Model -> Html Msg
 view model =
-    let
-        ost = printCardNames model.allCards
-       -- textable =  textalize ost
-    in div []
-    [ h1 [] [ text ("Title") ]
-    , h1 [] (ost)
+    div []
+    [ h1 [] [ text ("AppTitle") ]
+    , h1 [] (stringToText (cardsToNames model.allCards))
     , button [ onClick ShuffleCards ] [ text "Shuffle Cards" ]
     , div [] [text "WHITESPACE", text "BLACKSPACE"]
     , text "Mordi er en geit"
     ]
 
---textalize listOfStuff =
+stringToText: List String ->  List (Html Msg)
+stringToText listOfStuff =
+    case listOfStuff of
+        head :: tail -> text head :: stringToText tail
+        [] -> []
