@@ -4,7 +4,7 @@ import Browser
 import CardStuff exposing (initialCardList, cardsToNames, shuffleList)
 import Html exposing (..)
 import Html.Events exposing (..)
-import Model exposing (Card, Model)
+import Model exposing (Model, Card, Player)
 import Random exposing (Seed, initialSeed)
 
 -- MAIN
@@ -19,7 +19,7 @@ main =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model initialCardList
+  ( Model initialCardList [Model.Player "Gunnar" []]
   , Cmd.none
   )
 
@@ -27,21 +27,22 @@ init _ =
 -- UPDATE
 type Msg
   = ShuffleCards
-  | Randoomize Int
+  | ShuffleDeck Int
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     ShuffleCards ->
-      ( model
-      , Random.generate Randoomize (Random.int 1 99)
-      )
+        ( model
+--        , Random.generate ShuffleDeck (Random.int 1 99)
+        , Random.generate ShuffleDeck (Random.int Random.minInt Random.maxInt)
+        )
 
-    Randoomize seed  ->
-         ( Model ( shuffleList (initialSeed seed) model.allCards)
-          , Cmd.none
-          )
+    ShuffleDeck seed  ->
+        ( Model ( shuffleList (initialSeed seed) model.allCards) model.players
+        , Cmd.none
+        )
 -- independentSeed
 -- Fixed randomness:  initialSeed 5
 
