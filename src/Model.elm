@@ -3,6 +3,7 @@ module Model exposing (..)
 -- MODEL
 type alias Model =
   { players: List Player
+  , table: Player -- The cards on the table is represented in the same way as a single player
   , currentDeck : List Card
   }
 
