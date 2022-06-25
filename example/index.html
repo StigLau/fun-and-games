@@ -5899,9 +5899,14 @@ var $author$project$Main$playersToVisuals = function (players) {
 	if (!players.b) {
 		return '';
 	} else {
-		var head = players.a;
-		var tail = players.b;
-		return $author$project$Main$playerToVisuals(head) + (' - ' + $author$project$Main$playersToVisuals(tail));
+		if (!players.b.b) {
+			var head = players.a;
+			return $author$project$Main$playerToVisuals(head);
+		} else {
+			var head = players.a;
+			var tail = players.b;
+			return $author$project$Main$playerToVisuals(head) + (' - ' + $author$project$Main$playersToVisuals(tail));
+		}
 	}
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
