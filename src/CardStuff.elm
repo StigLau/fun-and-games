@@ -1,4 +1,4 @@
-module CardStuff exposing (initialCardList, shuffleList, cardsToNames, dealOneCardToPlayers, dealCardToPlayer)
+module CardStuff exposing (initialCardList, shuffleList, cardsToNames, dealOneCardToPlayers, dealCardToPlayer, calculateScores)
 
 import Model exposing (Model, Card, Player)
 import Random exposing (Seed, int, step)
@@ -19,9 +19,9 @@ initialCardList =
         ,(genCard "8 of Hearts" 8)
         ,(genCard "9 of Hearts" 9)
         ,(genCard "10 of Hearts" 10)
-        ,(genCard "Knight of Hearts" 11)
-        ,(genCard "Queen of Hearts" 12)
-        ,(genCard "King of Hearts" 13)
+        ,(genCard "Knight of Hearts" 10)
+        ,(genCard "Queen of Hearts" 10)
+        ,(genCard "King of Hearts" 10)
         ,(genCard "Ace of Clubs" 1)
         ,(genCard "2 of Clubs" 2)
         ,(genCard "3 of Clubs" 3)
@@ -32,9 +32,9 @@ initialCardList =
         ,(genCard "8 of Clubs" 8)
         ,(genCard "9 of Clubs" 9)
         ,(genCard "10 of Clubs" 10)
-        ,(genCard "Knight of Clubs" 11)
-        ,(genCard "Queen of Clubs" 12)
-        ,(genCard "King of Clubs" 13)
+        ,(genCard "Knight of Clubs" 10)
+        ,(genCard "Queen of Clubs" 10)
+        ,(genCard "King of Clubs" 10)
         ,(genCard "Ace of Spades" 1)
         ,(genCard "2 of Spades" 2)
         ,(genCard "3 of Spades" 3)
@@ -45,9 +45,9 @@ initialCardList =
         ,(genCard "8 of Spades" 8)
         ,(genCard "9 of Spades" 9)
         ,(genCard "10 of Spades" 10)
-        ,(genCard "Knight of Spades" 11)
-        ,(genCard "Queen of Spades" 12)
-        ,(genCard "King of Spades" 13)
+        ,(genCard "Knight of Spades" 10)
+        ,(genCard "Queen of Spades" 10)
+        ,(genCard "King of Spades" 10)
         ,(genCard "Ace of Diamonds" 1)
         ,(genCard "2 of Diamonds" 2)
         ,(genCard "3 of Diamonds" 3)
@@ -58,9 +58,9 @@ initialCardList =
         ,(genCard "8 of Diamonds" 8)
         ,(genCard "9 of Diamonds" 9)
         ,(genCard "10 of Diamonds" 10)
-        ,(genCard "Knight of Diamonds" 11)
-        ,(genCard "Queen of Diamonds" 12)
-        ,(genCard "King of Diamonds" 13)
+        ,(genCard "Knight of Diamonds" 10)
+        ,(genCard "Queen of Diamonds" 10)
+        ,(genCard "King of Diamonds" 10)
         ]
 
 cardsToNames: List Card ->  List String
@@ -118,4 +118,37 @@ dealCardToPlayer   singlePlayer stack =
                 head :: tail -> (addCardToPlayer singlePlayer head, tail)
 
 addCardToPlayer: Player -> Card -> Player
-addCardToPlayer player card = Player player.name (card :: player.hand)
+addCardToPlayer player card = Player player.name (card :: player.hand) 0
+
+calculateScores: Model -> Model
+calculateScores model =
+    let
+        table = model.table.hand
+        alteredPlayerList = List.map  mapShit  model.players  --(\x -> x )
+        bestScore = calculatePlayerHand 0 [Card "firstCard" 1, Card "SecondCard" 2]
+    in Model alteredPlayerList model.table model.currentDeck
+
+mapShit: Player -> Player
+mapShit playah =
+
+    Player playah.name playah.hand (calculatePlayerHand 0 playah.hand)
+
+
+calculatePlayerHand: Int -> List Card  -> Int
+calculatePlayerHand accScore cards  =
+    case cards of
+        [] -> accScore
+        head :: tail  ->
+            case head.cardId of
+                1 -> dealWithAce accScore tail
+                x -> calculatePlayerHand (accScore + x) tail
+
+dealWithAce: Int -> List Card -> Int
+dealWithAce accScore tail =
+    let
+        oneAlt = calculatePlayerHand (accScore + 1) tail
+        elevenAlt = calculatePlayerHand (accScore + 11) tail
+    in
+        if (elevenAlt <= 21)
+            then elevenAlt
+        else oneAlt

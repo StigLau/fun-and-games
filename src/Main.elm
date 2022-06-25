@@ -1,11 +1,12 @@
 module Main exposing (..)
 
 import Browser
-import CardStuff exposing (cardsToNames, dealCardToPlayer, dealOneCardToPlayers, initialCardList, shuffleList)
+import CardStuff exposing (calculateScores, cardsToNames, dealCardToPlayer, dealOneCardToPlayers, initialCardList, shuffleList)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Model exposing (Model, Card, Player)
 import Random exposing (Seed, initialSeed)
+import List exposing (map)
 
 -- MAIN
 main =
@@ -19,12 +20,12 @@ main =
 
 init : () -> (Model, Cmd Msg)
 init _ = ( Model
-  [ (Model.Player "Dealer" [])
-  , (Model.Player "Bjartram" [])
-  , (Model.Player "Gunnar" [])
-  , (Model.Player "Nisseleif" [])
-  , (Model.Player "Knugen av Danmark" [])
-  ] (Player "Table" []) initialCardList
+  [ (Model.Player "Dealer" [] 0)
+  , (Model.Player "Bjartram" [] 0)
+  , (Model.Player "Gunnar" [] 0)
+  , (Model.Player "Nisseleif" [] 0)
+  , (Model.Player "Knugen av Danmark" [] 0)
+  ] (Player "Table" [] 0) initialCardList
   , Cmd.none
   )
 
@@ -35,6 +36,7 @@ type Msg
   | ShuffleDeck Int
   | DealOneCard
   | DealOneCardToTable
+  | CalculateScores
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -57,7 +59,11 @@ update msg model =
     DealOneCardToTable ->
         let
             (table, nuDeck) = dealCardToPlayer model.table model.currentDeck
-        in (Model model.players table nuDeck, Cmd.none)
+        in
+            (Model model.players table nuDeck, Cmd.none)
+
+    CalculateScores ->
+        (calculateScores model, Cmd.none)
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
@@ -74,6 +80,7 @@ view model =
     , button [ onClick ShuffleCards ] [ text "Shuffle Deck" ]
     , button [ onClick DealOneCard ] [ text "Deal one card to players" ]
     , button [ onClick DealOneCardToTable ] [ text "Deal one card to Table" ]
+    , button [ onClick CalculateScores ] [ text "Calculate players Scores" ]
     , h2 [] [ text "List Players"]
     , text  (playersToVisuals model.players)
     , h2 [] [ text "Current table"]
@@ -88,7 +95,7 @@ playersToVisuals players =
 
 
 playerToVisuals: Player -> String
-playerToVisuals player = player.name ++  ": " ++  (List.foldl (++) "" (cardsToNames player.hand) )
+playerToVisuals player = player.name ++  ":  Score " ++ (String.fromInt player.score ) ++ " : " ++  (List.foldl (++) "" (cardsToNames player.hand) )
 
 
 stringToText: List String ->  List (Html Msg)

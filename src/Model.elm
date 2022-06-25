@@ -15,4 +15,5 @@ type alias Card =
 type alias Player =
     { name: String
     , hand : List Card
+    , score: Int
     }
