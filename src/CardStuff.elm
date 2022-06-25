@@ -125,14 +125,19 @@ calculateScores model =
     let
         table = model.table.hand
         alteredPlayerList = List.map  mapShit  model.players  --(\x -> x )
-        bestScore = calculatePlayerHand 0 [Card "firstCard" 1, Card "SecondCard" 2]
     in Model alteredPlayerList model.table model.currentDeck
 
 mapShit: Player -> Player
 mapShit playah =
+        Player playah.name playah.hand (calculatePlayerHand 0 playah.hand)
 
-    Player playah.name playah.hand (calculatePlayerHand 0 playah.hand)
+{-- Could not be used since Ace has many optional paths
+--      Player playah.name playah.hand (List.foldl cardFoldFunction 0 playah.hand)
 
+cardFoldFunction: (Card -> Int -> Int)
+cardFoldFunction card accumulated =
+    card.cardId + accumulated
+-}
 
 calculatePlayerHand: Int -> List Card  -> Int
 calculatePlayerHand accScore cards  =
