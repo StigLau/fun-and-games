@@ -88,6 +88,7 @@ playersToVisuals:  List Player -> String
 playersToVisuals players =
         case players of
             [] -> ""
+            [head] -> playerToVisuals head
             head :: tail -> (playerToVisuals head ) ++  " - " ++ (playersToVisuals tail)
 
 
