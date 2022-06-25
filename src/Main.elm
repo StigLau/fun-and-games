@@ -1,12 +1,13 @@
 module Main exposing (..)
 
 import Browser
-import CardStuff exposing (calculateScores, cardsToNames, dealCardToPlayer, dealOneCardToPlayers, initialCardList, shuffleList)
+import CardStuff exposing (calculateScores, cardsToNames, dealCardToPlayer, dealOneCardToPlayers, shuffleList)
+import CardSetup exposing (initialCardList)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Model exposing (Model, Card, Player)
 import Random exposing (Seed, initialSeed)
-import List exposing (map)
+import List
 
 -- MAIN
 main =
@@ -36,7 +37,6 @@ type Msg
   | ShuffleDeck Int
   | DealOneCard
   | DealOneCardToTable
-  | CalculateScores
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -54,16 +54,13 @@ update msg model =
         )
 
     DealOneCard ->
-        ( dealOneCardToPlayers model, Cmd.none)
+             (  calculateScores <| dealOneCardToPlayers model, Cmd.none )
 
     DealOneCardToTable ->
         let
             (table, nuDeck) = dealCardToPlayer model.table model.currentDeck
         in
-            (Model model.players table nuDeck, Cmd.none)
-
-    CalculateScores ->
-        (calculateScores model, Cmd.none)
+            (calculateScores <| Model model.players table nuDeck, Cmd.none)
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
@@ -80,8 +77,8 @@ view model =
     , button [ onClick ShuffleCards ] [ text "Shuffle Deck" ]
     , button [ onClick DealOneCard ] [ text "Deal one card to players" ]
     , button [ onClick DealOneCardToTable ] [ text "Deal one card to Table" ]
-    , button [ onClick CalculateScores ] [ text "Calculate players Scores" ]
     , h2 [] [ text "List Players"]
+
     , text  (playersToVisuals model.players)
     , h2 [] [ text "Current table"]
     , text  (playersToVisuals [model.table])

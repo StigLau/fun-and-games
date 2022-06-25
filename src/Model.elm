@@ -1,4 +1,4 @@
-module Model exposing (..)
+module Model exposing (Model, Player, Card)
 
 -- MODEL
 type alias Model =
