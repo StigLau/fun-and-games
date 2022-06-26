@@ -5353,6 +5353,14 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Main$ShuffleDeck = function (a) {
 	return {$: 'ShuffleDeck', a: a};
 };
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
 var $author$project$CardStuff$calculatePlayerHand = F2(
 	function (accScore, cards) {
 		calculatePlayerHand:
@@ -5382,25 +5390,38 @@ var $author$project$CardStuff$dealWithAce = F2(
 		var elevenAlt = A2($author$project$CardStuff$calculatePlayerHand, accScore + 11, tail);
 		return (elevenAlt <= 21) ? elevenAlt : oneAlt;
 	});
-var $author$project$CardStuff$mapShit = function (playah) {
-	return A3(
-		$author$project$Model$Player,
-		playah.name,
-		playah.hand,
-		A2($author$project$CardStuff$calculatePlayerHand, 0, playah.hand));
-};
+var $author$project$CardStuff$calculatePerPlayer = F2(
+	function (players, table) {
+		if (!players.b) {
+			return _List_Nil;
+		} else {
+			var head = players.a;
+			var tail = players.b;
+			var tailCalc = A2($author$project$CardStuff$calculatePerPlayer, tail, table);
+			var headCalc = A2(
+				$author$project$CardStuff$calculatePlayerHand,
+				head.score,
+				A2($elm$core$List$append, table, head.hand));
+			return A2(
+				$elm$core$List$cons,
+				A3($author$project$Model$Player, head.name, head.hand, headCalc),
+				tailCalc);
+		}
+	});
 var $author$project$CardStuff$calculateScores = function (model) {
-	var table = model.table.hand;
-	var alteredPlayerList = A2($elm$core$List$map, $author$project$CardStuff$mapShit, model.players);
-	return A3($author$project$Model$Model, alteredPlayerList, model.table, model.currentDeck);
+	return _Utils_update(
+		model,
+		{
+			players: A2($author$project$CardStuff$calculatePerPlayer, model.players, model.table.hand)
+		});
 };
 var $author$project$CardStuff$addCardToPlayer = F2(
 	function (player, card) {
-		return A3(
-			$author$project$Model$Player,
-			player.name,
-			A2($elm$core$List$cons, card, player.hand),
-			0);
+		return _Utils_update(
+			player,
+			{
+				hand: A2($elm$core$List$cons, card, player.hand)
+			});
 	});
 var $author$project$CardStuff$dealCardToPlayer = F2(
 	function (singlePlayer, stack) {
