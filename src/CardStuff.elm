@@ -59,18 +59,20 @@ dealCardToPlayer   singlePlayer stack =
                 head :: tail -> (addCardToPlayer singlePlayer head, tail)
 
 addCardToPlayer: Player -> Card -> Player
-addCardToPlayer player card = Player player.name (card :: player.hand) 0
+addCardToPlayer player card =
+    {player | hand = (card :: player.hand) }
 
 calculateScores: Model -> Model
 calculateScores model =
-    let
-        table = model.table.hand
-        alteredPlayerList = List.map  mapShit  model.players  --(\x -> x )
-    in Model alteredPlayerList model.table model.currentDeck
+     { model | players = (calculatePerPlayer model.players model.table.hand) }
 
-mapShit: Player -> Player
-mapShit playah =
-        Player playah.name playah.hand (calculatePlayerHand 0 playah.hand)
+calculatePerPlayer: List Player -> List Card -> List Player
+calculatePerPlayer players table =
+    case players of
+        [] -> []
+        head :: tail ->
+                Player head.name head.hand (calculatePlayerHand head.score (List.append table head.hand)) :: (calculatePerPlayer tail table)
+
 
 {-- Could not be used since Ace has many optional paths
 --      Player playah.name playah.hand (List.foldl cardFoldFunction 0 playah.hand)
