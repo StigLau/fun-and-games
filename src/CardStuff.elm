@@ -71,8 +71,11 @@ calculatePerPlayer players table =
     case players of
         [] -> []
         head :: tail ->
-                Player head.name head.hand (calculatePlayerHand head.score (List.append table head.hand)) :: (calculatePerPlayer tail table)
-
+            let
+                headCalc = (calculatePlayerHand head.score (List.append table head.hand))
+                tailCalc = (calculatePerPlayer tail table)
+            in
+                Player head.name head.hand  headCalc :: tailCalc
 
 {-- Could not be used since Ace has many optional paths
 --      Player playah.name playah.hand (List.foldl cardFoldFunction 0 playah.hand)
