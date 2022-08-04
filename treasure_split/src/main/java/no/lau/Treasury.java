@@ -1,36 +1,13 @@
-import org.junit.jupiter.api.Test;
+package no.lau;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+public class Treasury {
 
-public class TreasureSplitTest {
-
-    @Test
-    public void testFirstVersion() throws WrongBranchException {
-        Map<Integer, List<Integer>> result = shareBagOfGems(0, init(3), List.of(4, 4, 4) );
-        //Assume bag is sorted
-        assertEquals(result.size(), 3);
-        assertEquals(4, result.get(0).get(0));
-        assertEquals(4, result.get(1).get(0));
-        assertEquals(4, result.get(2).get(0));
-    }
-
-    @Test
-    public void twoSeekerDilemma() throws WrongBranchException {
-        //Map<Integer, List<Integer>> result = doStuff(init(2), List.of(27, 7, 20) );
-        Map<Integer, List<Integer>> result = shareBagOfGems(0, init(2), List.of(27, 20, 7) );
-        assertEquals(result.size(), 2);
-        assertEquals(27, result.get(0).get(0));
-        assertEquals(20, result.get(1).get(0));
-        assertEquals(7, result.get(1).get(1));
-
-        shareBagOfGems(0, init(2), List.of( 20, 7, 27) );
-        shareBagOfGems(0, init(2), List.of( 27, 7, 20) );
-    }
-
-
-    public Map<Integer, List<Integer>> shareBagOfGems(int hunterRef, Map<Integer, List<Integer>> original, List<Integer> gems) throws WrongBranchException {
+    public static Map<Integer, List<Integer>> shareBagOfGems(int hunterRef, Map<Integer, List<Integer>> original, List<Integer> gems) throws WrongBranchException {
 
         Map<Integer, List<Integer>> result = deepCopy(original);
 
@@ -61,7 +38,7 @@ public class TreasureSplitTest {
         return result;
     }
 
-    private Map<Integer, List<Integer>> deepCopy(Map<Integer, List<Integer>> original) {
+    private static Map<Integer, List<Integer>> deepCopy(Map<Integer, List<Integer>> original) {
         Map<Integer, List<Integer>> copy = new HashMap<>();
         for (Map.Entry<Integer, List<Integer>> integerListEntry : original.entrySet()) {
             List<Integer> nuList = new ArrayList<>();
@@ -71,7 +48,7 @@ public class TreasureSplitTest {
         return copy;
     }
 
-    private boolean isLegalResult(Map<Integer, List<Integer>> result) throws WrongBranchException {
+    private static boolean isLegalResult(Map<Integer, List<Integer>> result) throws WrongBranchException {
         Integer compareToPouch = null;
         for (Integer key : result.keySet()) {
             Integer thisPouch = result.get(key).stream().reduce(Integer::sum).get();
@@ -85,7 +62,7 @@ public class TreasureSplitTest {
         return true;
     }
 
-    Map<Integer, List<Integer>> init(int nrOfHunters) {
+    public static Map<Integer, List<Integer>> init(int nrOfHunters) {
         //Initialize
         Map<Integer, List<Integer>> result = new HashMap<>();
         for (int i = 0; i < nrOfHunters; i++) {
@@ -95,8 +72,7 @@ public class TreasureSplitTest {
     }
 }
 
-
-class WrongBranchException extends Exception {
+class WrongBranchException extends RuntimeException {
 
     public WrongBranchException(String message) {
         super(message);
