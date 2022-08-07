@@ -7,7 +7,6 @@ import java.util.*;
 public class Treasury {
 
     public static Map<Integer, List<Integer>> shareBagOfGems(Map<Integer, List<Integer>> hunters, List<Integer> gems) throws WrongBranchException {
-
         List<Integer> reverseSortedGems = new ArrayList<>(gems);
         Collections.sort(reverseSortedGems, Collections.reverseOrder());
 
